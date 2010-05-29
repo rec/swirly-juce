@@ -29,7 +29,7 @@ int main() {
   float* interleaved = (float*) malloc(2 * BYTE_SIZE);
   float* parallel[2] = {interleaved, interleaved + SIZE};
 
-  printf("non-interleaved: %lld\n", test(interleaved, parallel, false));
+  printf("parallel: %lld\n", test(interleaved, parallel, false));
   printf("interleaved: %lld\n", test(interleaved, parallel, true));
 
   free(interleaved);
