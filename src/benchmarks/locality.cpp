@@ -4,23 +4,29 @@
 
 typedef long long int int64;
 
-static const int64 PRIME1 = 51234577L;
-static const int64 PRIME2 = 20000003L;
+static const int64 PRIME = 51234577L;
+static const int64 MULT = 20000003L;
+
+// This is based on modular arithmetic:
+// http://en.wikipedia.org/wiki/Modular_arithmetic
+//
+// Suppose p is a prime, and m is any non-zero integer multiplier.  As i
+// iterates through all numbers in [0, p), (m * i) mod p also iterates through
+// all of [0, p), but in a completely different permutation.
+//
+// An easy way to see this is with smaller numbers.  Suppose p = 7 -
+// if  i iterates through [0, 1, 2, 3, 4, 5, 6],
+// 2 * i iterates through [0, 2, 4, 6, 1, 3, 5]
+// 3 * i iterates through [0, 3, 6, 2, 5, 1, 4]
+// 4 * i iterates through [0, 4, 1, 5, 2, 6, 3]
 
 int64 test(bool linear) {
-  char* buffer = (char*) malloc(PRIME1);
+  char* buffer = (char*) malloc(PRIME);
   int64 time = -int64(clock());
 
-  if (linear) {
-    for (int64 i = 0; i < PRIME1; ++i) {
-      int64 nonlinear = (i * PRIME2) % PRIME1;
-      buffer[i] = char(nonlinear);
-    }
-  } else {
-    for (int64 i = 0; i < PRIME1; ++i) {
-      int64 nonlinear = (i * PRIME2) % PRIME1;
-      buffer[nonlinear] = char(nonlinear);
-    }
+  for (int64 i = 0; i < PRIME; ++i) {
+    int64 permuted = (i * MULT) % PRIME;
+    buffer[linear ? i : permuted] = char(permuted);
   }
 
   time += clock();
@@ -30,6 +36,6 @@ int64 test(bool linear) {
 }
 
 int main() {
-  printf("nonlinear: %lld\n", test(false));
+  printf("permuted: %lld\n", test(false));
   printf("linear: %lld\n", test(true));
 }
