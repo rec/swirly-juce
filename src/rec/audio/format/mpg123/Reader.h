@@ -33,7 +33,6 @@ class Reader : public AudioFormatReader {
   void* buffer_;
   size_t size_, allocated_;
   Copier copier_;
-  int bytesPerSample_;
 
   Reader(InputStream* in, const String& name, mpg123_handle* mh);
 

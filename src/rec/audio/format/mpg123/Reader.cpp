@@ -26,38 +26,34 @@ Reader::~Reader()	{
   free(buffer_);
 }
 
-Error Reader::create(InputStream* in, const String& name, Reader** r) {
-  mpg123_handle* mh;
-  if (Error e = newHandle(in, &mh))
-    return e;
+Error Reader::create(InputStream* in, const String& name, Reader** reader) {
+  Error e;
+  mpg123_handle* mh = NULL;
+  Reader* r = NULL;
 
   long sampleRate;
-  int encoding;
-  int numChannels;
-  if (Error e = mpg123_getformat(mh, &sampleRate, &numChannels, &encoding)) {
+  int numChannels, encoding;
+
+  if ((e = newHandle(in, &mh)) ||
+      (r = new Reader(in, name, mh)) ||
+      (e = mpg123_getformat(mh, &sampleRate, &numChannels, &encoding)) ||
+      !(r->bitsPerSample = getBitsPerSample(encoding)) ||
+      !(r->copier_ = getCopier(encoding)) ||
+      numChannels > MPG123_STEREO) {
     mpg123_delete(mh);
-    return e;
+    delete r;
+
+    return e ? e : MPG123_ERR;
   }
 
-  int bitsPerSample = getBitsPerSample(encoding);
-  Copier copier = getCopier(encoding);
+  r->sampleRate = int(sampleRate);
+  r->lengthInSamples = mpg123_length(mh);
+  r->usesFloatingPointData = (encoding & MPG123_ENC_FLOAT);
+  r->numChannels = numChannels;
 
-  if (!(bitsPerSample && copier && numChannels <= MPG123_STEREO)) {
-    mpg123_delete(mh);
-    return MPG123_ERR;
-  }
+  getMp3Tags(mh, &r->metadataValues);  // TODO: check errors and...?
 
-  *r = new Reader(in, name, mh);
-
-  (*r)->copier_ = copier;
-  (*r)->sampleRate = int(sampleRate);
-  (*r)->bitsPerSample = bitsPerSample;
-  (*r)->bytesPerSample_ = bitsPerSample / 8;
-  (*r)->numChannels = numChannels;
-  (*r)->lengthInSamples = mpg123_length(mh);
-  (*r)->usesFloatingPointData = (encoding & MPG123_ENC_FLOAT);
-  getMp3Tags(mh, &(*r)->metadataValues);  // TODO: check errors and...?
-
+  *reader = r;
   return MPG123_OK;
 }
 
@@ -66,11 +62,13 @@ bool Reader::readSamples(int** dest, int destChannels, int destOffset,
   if (mpg123_seek(mh_, startSampleInFile, SEEK_SET))
     return false;
 
-  size_ = numSamples * numChannels * bytesPerSample_;
+  int64 bytesPerSample = this->bitsPerSample / 8;
+  size_ = numSamples * numChannels * bytesPerSample;
 
   if (allocated_ < size_) {
     if (buffer_)
       free(buffer_);
+
     buffer_ = malloc(size_);
     allocated_ = size_;
   }
@@ -80,7 +78,7 @@ bool Reader::readSamples(int** dest, int destChannels, int destOffset,
   if (e != MPG123_DONE && e != MPG123_OK)
     return false;
 
-  int64 sourceSize = bytesCopied / bytesPerSample_;
+  int64 sourceSize = bytesCopied / (bytesPerSample);
   copier_(dest, destChannels, destOffset, buffer_, numChannels, sourceSize);
   return (bytesCopied == size_);
 }

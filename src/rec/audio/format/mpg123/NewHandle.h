@@ -10,7 +10,7 @@ namespace audio {
 namespace format {
 namespace mpg123 {
 
-// Create a new mpg123_handle for a Juce input stream.
+// Create a new mpg123_handle for a Juce InputStream.
 Error newHandle(InputStream* in, mpg123_handle** mh);
 
 }  // namespace mpg123

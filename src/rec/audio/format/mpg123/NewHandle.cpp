@@ -15,7 +15,7 @@ namespace format {
 namespace mpg123 {
 
 #include "libmpg123/mpg123.h"
-  
+
 namespace {
 
 ssize_t read(void *inputStream, void *buf, size_t nbytes) {
@@ -25,55 +25,35 @@ ssize_t read(void *inputStream, void *buf, size_t nbytes) {
 off_t seek(void *inputStream, off_t offset, int whence) {
   InputStream* in = reinterpret_cast<InputStream*>(inputStream);
 
-  switch (whence) {
-    case SEEK_CUR:
-      offset += in->getPosition();
-      break;
+  if (whence == SEEK_CUR)
+    offset += in->getPosition();
 
-    case SEEK_SET:
-      break;
+  else if (whence == SEEK_END)
+    offset = in->getTotalLength() - offset;
 
-    case SEEK_END: {
-      offset = in->getTotalLength() - offset;
-      if (offset < 0)
-        return -1;
+  else if (whence != SEEK_SET)
+    offset = -1;
 
-      break;
-    }
-
-    default:
-      return -1;
-  }
-
-  return in->setPosition(offset) ? offset : -1;
+  return (offset >= 0) && in->setPosition(offset) ? offset : -1;
 }
 
 }  // namespace
 
 Error newHandle(InputStream* in, mpg123_handle** result) {
-  if (Error e = initializeOnce())
-    return e;
-
   Error e;
-  mpg123_handle* mh = mpg123_new(NULL, &e);
-  if (e)
-    return e;
+  mpg123_handle* mh = NULL;
 
-  scoped_ptr<mpg123_handle> mhs(mh);
+  if (!(e = initializeOnce()) &&
+      !(mh = mpg123_new(NULL, &e)) &&
+      !(e = mpg123_replace_reader_handle(mh, read, seek, NULL)) &&
+      !(e = mpg123_open_handle(mh, in)) &&
+      !(e = mpg123_scan(mh)))
+    *result = mh;
+  else
+    mpg123_delete(mh);
 
-  if (Error e = mpg123_replace_reader_handle(mh, read, seek, NULL))
-    return e;
-
-  if (Error e = mpg123_open_handle(mh, in))
-    return e;
-
-  if (Error e = mpg123_scan(mh))
-    return e;
-
-  return MPG123_OK;
+  return e;
 }
-
-
 
 }  // namespace mpg123
 }  // namespace format
