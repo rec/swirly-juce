@@ -1,12 +1,14 @@
-#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 typedef long long int int64;
 
-static const int64 PRIME = 51234577L;
-static const int64 MULT = 20000003L;
+const int64 PRIME = 51234577L;
 
+char* buffer = (char*) malloc(PRIME);
+
+// permute() permutes the numbers between 0 and PRIME - 1 inclusive.
 // This is based on modular arithmetic:
 // http://en.wikipedia.org/wiki/Modular_arithmetic
 //
@@ -19,23 +21,27 @@ static const int64 MULT = 20000003L;
 // 2 * i iterates through [0, 2, 4, 6, 1, 3, 5]
 // 3 * i iterates through [0, 3, 6, 2, 5, 1, 4]
 // 4 * i iterates through [0, 4, 1, 5, 2, 6, 3]
+inline int64 permute(int64 x) {
+  static const int64 MULT = 20000003L;
+
+  return (x * MULT) % PRIME;
+}
 
 int64 test(bool linear) {
-  char* buffer = (char*) malloc(PRIME);
   int64 time = -int64(clock());
 
   for (int64 i = 0; i < PRIME; ++i) {
-    int64 permuted = (i * MULT) % PRIME;
+    int64 permuted = permute(i);
     buffer[linear ? i : permuted] = char(permuted);
   }
 
-  time += clock();
-  free(buffer);
-
-  return time;
+  return time + clock();;
 }
 
 int main() {
-  printf("permuted: %lld\n", test(false));
-  printf("linear: %lld\n", test(true));
+  int64 permuted = test(false);
+  int64 linear = test(true);
+
+  printf("\npermuted:  %lldms\nlinear:    %lldms\nratio:     %.2f\n\n",
+         permuted / 1000, linear / 1000, permuted / double(linear));
 }
