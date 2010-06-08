@@ -12,12 +12,14 @@ namespace mpg123 {
 
 #include "libmpg123/mpg123.h"
 
-Reader::Reader(InputStream* in, const String& formatName, mpg123_handle* mh)
+Reader::Reader(InputStream* in, const String& formatName, mpg123_handle* mh,
+               Copier copier)
   : AudioFormatReader(in, formatName),
     mh_(mh),
     buffer_(NULL),
     size_(0),
-    allocated_(0) {
+    allocated_(0),
+    copier_(copier) {
 }
 
 Reader::~Reader()	{
@@ -26,40 +28,9 @@ Reader::~Reader()	{
   free(buffer_);
 }
 
-Error Reader::create(InputStream* in, const String& name, Reader** reader) {
-  Error e;
-  mpg123_handle* mh = NULL;
-  Reader* r = NULL;
-
-  long sampleRate;
-  int numChannels, encoding;
-
-  if ((e = newHandle(in, &mh)) ||
-      (r = new Reader(in, name, mh)) ||
-      (e = mpg123_getformat(mh, &sampleRate, &numChannels, &encoding)) ||
-      !(r->bitsPerSample = getBitsPerSample(encoding)) ||
-      !(r->copier_ = getCopier(encoding)) ||
-      numChannels > MPG123_STEREO) {
-    mpg123_delete(mh);
-    delete r;
-
-    return e ? e : MPG123_ERR;
-  }
-
-  r->sampleRate = int(sampleRate);
-  r->lengthInSamples = mpg123_length(mh);
-  r->usesFloatingPointData = (encoding & MPG123_ENC_FLOAT);
-  r->numChannels = numChannels;
-
-  getMp3Tags(mh, &r->metadataValues);  // TODO: check errors and...?
-
-  *reader = r;
-  return MPG123_OK;
-}
-
 bool Reader::readSamples(int** dest, int destChannels, int destOffset,
                          int64 startSampleInFile, int numSamples) {
-  if (mpg123_seek(mh_, startSampleInFile, SEEK_SET))
+  if (mpg123_seek(mh_, startSampleInFile, SEEK_SET) < 0)
     return false;
 
   int64 bytesPerSample = this->bitsPerSample / 8;
@@ -78,7 +49,7 @@ bool Reader::readSamples(int** dest, int destChannels, int destOffset,
   if (e != MPG123_DONE && e != MPG123_OK)
     return false;
 
-  int64 sourceSize = bytesCopied / (bytesPerSample);
+  int64 sourceSize = bytesCopied / (bytesPerSample * numChannels);
   copier_(dest, destChannels, destOffset, buffer_, numChannels, sourceSize);
   return (bytesCopied == size_);
 }

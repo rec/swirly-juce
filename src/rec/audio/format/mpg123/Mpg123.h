@@ -1,6 +1,8 @@
 #ifndef __REC_AUDIO_FORMAT_MPG123_MPG123__
 #define __REC_AUDIO_FORMAT_MPG123_MPG123__
 
+// Constants and static functions for the mpg123 library.
+
 #include "juce_amalgamated.h"
 
 namespace rec {
@@ -25,7 +27,7 @@ Error initializeOnce();
 void exitOnce();
 
 // The list of mp3 file extensions we recognize by default.
-StringArray getFileExtensions();
+StringArray getMp3FileExtensions();
 
 // The list of preferred samples rates - however, the decoder can apparently
 // emit any sample rate you like.
@@ -37,12 +39,19 @@ Array<int> getSampleRates();
 // in the wild...
 Array<int> getBitDepths();
 
-// Read mp3 tags into a StringPairArray.
-Error getMp3Tags(mpg123_handle* mh, StringPairArray* metadata);
-
 // Number of bits per sample for this output encoding.
 // encoding should be from mpg123_enc_enum.
 int getBitsPerSample(int encoding);
+
+// Get the name, translated into the current language.
+String getTranslatedName();
+
+// Get the default audio format manager and make sure it knows about mp3s.
+AudioFormatManager* getAudioFormatManager();
+
+inline AudioFormatReader* getFileReader(const File& file) {
+  return file.exists() ? getAudioFormatManager()->createReaderFor(file) : NULL;
+}
 
 }  // namespace mpg123
 }  // namespace format

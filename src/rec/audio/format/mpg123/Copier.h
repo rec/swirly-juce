@@ -8,8 +8,6 @@ namespace audio {
 namespace format {
 namespace mpg123 {
 
-#include "libmpg123/mpg123.h"
-
 // A function that copies samples from source to destination.
 typedef void (*Copier)(int** dest, int destChannels, int destOffset,
                        void* source, int sourceChannels, size_t sourceSize);

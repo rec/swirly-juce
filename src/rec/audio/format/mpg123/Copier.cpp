@@ -1,4 +1,5 @@
 #include "rec/audio/format/mpg123/Copier.h"
+#include "rec/audio/format/mpg123/Mpg123.h"
 
 namespace rec {
 namespace audio {
@@ -43,14 +44,12 @@ struct Copy {
   }
 };
 
-typedef unsigned char uchar;
-typedef unsigned short ushort;
-typedef unsigned int uint;
+template<> int Copy<char,   int>::cast(char x)   { return 0x1000000 * int(x); }
+template<> int Copy<short,  int>::cast(short x)  { return 0x10000 * int(x); }
 
-template<> int Copy<char,   int>::cast(char x)   { return 0x100000 * int(x); }
-template<> int Copy<uchar,  int>::cast(uchar x)  { return cast(char(int(x) - 0x80)); }
-template<> int Copy<short,  int>::cast(short x)  { return 0x1000 * int(x); }
-template<> int Copy<ushort, int>::cast(ushort x) { return cast(short(int(x) - 0x8000)); }
+template<> int Copy<uchar,  int>::cast(uchar x)  { return 0x1000000 * char(int(x) - 0x80); }
+template<> int Copy<ushort, int>::cast(ushort x) { return 0x10000 * (int(x) - 0x8000); }
+template<> int Copy<uint,   int>::cast(uint x)   { return int(int64(x) - 0x80000000L); }
 
 }  // namespace
 

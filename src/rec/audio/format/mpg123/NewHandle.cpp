@@ -29,7 +29,7 @@ off_t seek(void *inputStream, off_t offset, int whence) {
     offset += in->getPosition();
 
   else if (whence == SEEK_END)
-    offset = in->getTotalLength() - offset;
+    offset += in->getTotalLength();
 
   else if (whence != SEEK_SET)
     offset = -1;
@@ -44,11 +44,11 @@ Error newHandle(InputStream* in, mpg123_handle** result) {
   mpg123_handle* mh = NULL;
 
   if (!(e = initializeOnce()) &&
-      !(mh = mpg123_new(NULL, &e)) &&
+      (mh = mpg123_new(NULL, &e)) &&
       !(e = mpg123_replace_reader_handle(mh, read, seek, NULL)) &&
-      !(e = mpg123_open_handle(mh, in)) &&
-      !(e = mpg123_scan(mh)))
+      !(e = mpg123_open_handle(mh, in)))
     *result = mh;
+
   else
     mpg123_delete(mh);
 

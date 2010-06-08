@@ -1,5 +1,6 @@
 #include "juce_amalgamated.h"
 #include "rec/audio/format/mpg123/Mpg123.h"
+#include "rec/audio/format/mpg123/Format.h"
 
 namespace rec {
 namespace audio {
@@ -52,9 +53,9 @@ void exitOnce() {
   Initializer::instance().exit();
 }
 
-StringArray getFileExtensions() {
-  const tchar* const extensions[] = {
-    JUCE_T(".mp3"), JUCE_T(".mp2"), JUCE_T(".mp1"), 0
+StringArray getMp3FileExtensions() {
+  static const tchar* const extensions[] = {
+    JUCE_T(".mp3"), JUCE_T(".mp2"), JUCE_T(".mp1"), NULL
   };
   return StringArray(extensions);
 }
@@ -84,41 +85,22 @@ int getBitsPerSample(int encoding) {
     0;
 }
 
-inline String toString(const mpg123_string* s) {
-  return String(s->p, s->fill);
+String getTranslatedName() {
+  return TRANS("MP3 Audio file");
 }
 
-Error getMp3Tags(mpg123_handle* mh, StringPairArray* metadata) {
-  if (!mpg123_meta_check(mh))
-    return MPG123_ERR;
+static AudioFormatManager* getAFMInitialized() {
+  AudioFormatManager* afm = AudioFormatManager::getInstance();
+  afm->registerBasicFormats();
+  afm->registerFormat(new Format(), false);
 
-  mpg123_id3v1 *v1;
-  mpg123_id3v2 *v2;
+  return afm;
+}
 
-  if (Error e = mpg123_id3(mh, &v1, &v2))
-    return e;
-
-  if (v2) {
-    metadata->set("title", toString(v2->title));
-    metadata->set("artist", toString(v2->artist));
-    metadata->set("album", toString(v2->album));
-    metadata->set("year", toString(v2->year));
-    metadata->set("genre", toString(v2->genre));
-    metadata->set("comment", toString(v2->comment));
-    return MPG123_OK;
-  }
-
-  if (v1) {
-    metadata->set("title", String(v1->title, 30));
-    metadata->set("artist", String(v1->artist, 30));
-    metadata->set("album", String(v1->album, 30));
-    metadata->set("year", String(v1->year, 4));
-    metadata->set("comment", String(v1->comment, 30));
-    metadata->set("genre", String((const char*) &v1->genre, 1));
-    return MPG123_OK;
-  }
-
-  return MPG123_ERR;
+// Get the default audio format manager and make sure it knows about mp3s.
+AudioFormatManager* getAudioFormatManager() {
+  static AudioFormatManager* afm = getAFMInitialized();
+  return afm;
 }
 
 }  // namespace mpg123
