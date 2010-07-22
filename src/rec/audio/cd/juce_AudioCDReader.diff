@@ -410,14 +410,12 @@ index 9f8bc18..bbe7f02 100644
      {
 -        numTracks = 1 + toc.lastTrack - toc.firstTrack;
 +        int numTracks = 1 + toc.lastTrack - toc.firstTrack;
-+
 
          for (int i = 0; i <= numTracks; ++i)
          {
 -            trackStarts[i] = getAddressOf (&toc.tracks[i]);
--            audioTracks[i] = ((toc.tracks[i].ADR & 4) == 0);
 +            trackStartSamples.add (getAddressOf (&toc.tracks [i]));
-+            audioTracks [i] = ((toc.tracks[i].ADR & 4) == 0);
+             audioTracks[i] = ((toc.tracks[i].ADR & 4) == 0);
          }
      }
 -    else
@@ -430,7 +428,7 @@ index 9f8bc18..bbe7f02 100644
  {
 -    return (trackNum >= 0 && trackNum <= numTracks) ? audioTracks [trackNum]
 -                                                    : false;
-+    return (trackNum >= 0) && (trackNum <= getNumTracks()) && audioTracks [trackNum];
++    return trackNum >= 0 && trackNum <= getNumTracks() && audioTracks [trackNum];
  }
 
  void AudioCDReader::enableIndexScanning (bool b)
