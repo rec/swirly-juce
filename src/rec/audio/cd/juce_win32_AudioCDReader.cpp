@@ -1843,14 +1843,14 @@ int AudioCDReader::getPositionOfTrackStart (int trackNum) const
 {
     using namespace CDReaderHelpers;
     return (trackNum >= 0 && trackNum <= getNumTracks ()) ?
-        trackStartSamples [trackNum] * samplesPerFrame : 0;
+        trackStartSamples[trackNum] * samplesPerFrame : 0;
 }
 
 void AudioCDReader::refreshTrackLengths()
 {
     using namespace CDReaderHelpers;
-    zeromem (audioTracks, sizeof (audioTracks));
     trackStartSamples.clear();
+    zeromem (audioTracks, sizeof (audioTracks));
 
     TOC toc;
     zerostruct (toc);
@@ -1858,7 +1858,6 @@ void AudioCDReader::refreshTrackLengths()
     if (((CDDeviceWrapper*)handle)->cdH->readTOC (&toc, false))
     {
         int numTracks = 1 + toc.lastTrack - toc.firstTrack;
-
 
         for (int i = 0; i <= numTracks; ++i)
         {
@@ -1870,7 +1869,7 @@ void AudioCDReader::refreshTrackLengths()
 
 bool AudioCDReader::isTrackAudio (int trackNum) const
 {
-    return (trackNum >= 0) && (trackNum <= getNumTracks()) && audioTracks [trackNum];
+    return trackNum >= 0 && trackNum <= getNumTracks() && audioTracks [trackNum];
 }
 
 void AudioCDReader::enableIndexScanning (bool b)
