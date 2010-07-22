@@ -1,7 +1,4 @@
-// This will be a .cpp file once I know how to do this for one platform.
-
-// Apple's plist format shows a profound lack of understanding of how to put
-// together an XML document.  Here's an example for a CD, some parts omitted.
+// Here's the structure of a sample Mac OS/X .TOC.plist file.
 //
 // <plist version="1.0">
 // <dict>
@@ -10,35 +7,96 @@
 //
 // 	<key>Sessions</key>
 // 	<array>
-// 		<dict>
+//     <dict>
 //
-//    [other key/data pairs here]
+//       [other key/data pairs that we don't care about here]
 //
-// 			<key>Track Array</key>
-// 			<array>
-// 				<dict>
-//
-//          [other key/data pairs here]
-//
-// 					<key>Start Block</key>
-// 					<integer>150</integer>
-// 				</dict>
-//
-// 				<dict>
+//       <key>Track Array</key>
+//       <array>
+//         <dict>
 //
 //          [other key/data pairs here]
 //
-// 					<key>Start Block</key>
-// 					<integer>2029</integer>
-// 				</dict>
+//           <key>Start Block</key>
+//           <integer>150</integer>
+//         </dict>
+//
+//         <dict>
+//
+//          [other key/data pairs here]
+//
+//           <key>Start Block</key>
+//           <integer>2029</integer>
+//         </dict>
 //
 //        [more dicts here]
 //
-// 			</array>
-// 		</dict>
-// 	</array>
+//       </array>
+//     </dict>
+//   </array>
 // </dict>
 // </plist>
+
+// Apple's plist format uses XML in an unusual fashion as a sort of lame
+// imitation of JSON - but why not just use JSON, or even better, its superset
+// YAML?
+//
+// Their format defeats the whole purpose of XML, where your meaning is put in
+// the tag names, by having meaningless tag names and having the meaning hidden
+// in the value where neither your XPath, your XSLT nor your XML schema can get
+// to it.
+//
+// An idiomatic XML document for the one above might look like:
+//
+// <sessions>
+//   <trackArray>
+//     <track>
+//       <startBlock=150/>
+//     </track>
+//   </trackArray>
+// </sessions>
+//
+// Now isn't that so much clearer?  Let's look at a subpart...
+//
+//   <trackArray><track><startBlock=150/></track></trackArray>
+//
+// vs Apple's
+//
+//   <key>Track Array</key>
+//   <array><dict><key>Start Block</key><integer>150</integer></dict></array>
+//
+// Let's compare JSON (json.org)
+//
+//   {"trackArray": [{"startBlock": 150}]}
+//
+// Much nicer, yes?
+//
+// JSON is a subset of YAML 1.2, but you could also write it in YAML (see yaml.org) as:
+//
+//   trackArray:
+//     -
+//       startBlock: 150
+//
+// which seems a little cryptic until you see a longer document...
+//
+//   sessions:
+//     -
+//       first track: 1
+//       last track: 11
+//       leadout block: 168953
+//       track array:
+//         -
+//           startBlock: 150
+//           data: false
+//           point: 1
+//         -
+//           startBlock: 15240
+//           data: false
+//           point: 2
+//
+// See how well it exposes just the data with whitespace and compare it to the
+// .TOC.plist in this directory!  And you're always free to use the JSON form
+// even within one file.
 
 inline const XmlElement* getElementForKey(const XmlElement& xml,
                                           const String& key) {
