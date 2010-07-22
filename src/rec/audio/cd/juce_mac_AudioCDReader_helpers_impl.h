@@ -40,7 +40,6 @@
 // </dict>
 // </plist>
 
-
 inline const XmlElement* getElementForKey(const XmlElement& xml,
                                           const String& key) {
     forEachXmlChildElementWithTagName(xml, child, "key")
@@ -97,10 +96,10 @@ inline const char* getTrackOffsets(XmlDocument* xmlDocument,
         int trackValue = getIntValueForKey(*track, "Start Block");
         if (trackValue < 0)
             return "Couldn't find Start Block in the track";
-        offsets->add(trackValue);
+        offsets->add(trackValue * AudioCDReader::SAMPLES_PER_FRAME);
     }
 
-    offsets->add(leadOut);
+    offsets->add(leadOut * AudioCDReader::SAMPLES_PER_FRAME);
     return NULL;
 }
 
@@ -116,59 +115,4 @@ inline const char* getTrackOffsets(const File& volume,
 
     XmlDocument doc(toc);
     return getTrackOffsets(&doc, offsets);
-}
-
-// Returns the sum of the decimal digits in n.
-inline int sumOfDigits(int n) {
-    int sum = 0;
-    while (n > 0) {
-        sum = sum + (n % 10);
-        n = n / 10;
-    }
-    return sum;
-}
-
-#define convertEarly false
-
-// Compute the CDDB id from an array of offsets.
-//
-// convertEarly models the fact that when you compute the total length, you can
-// either take the difference between first and last frames and then convert to
-// seconds, or you can convert the first and last frame to seconds and take the
-// difference, which I call "convertEarly".
-//
-// Conceptually, "convertEarly" isn't right - you want to do your calculations
-// as soon as possible - but
-//
-
-// My educated guess is that 37 times in 75 these two computations
-// will differ by 1 second.
-//
-// http://www.cs.princeton.edu/introcs/51data/CDDB.java.html
-inline int getCDDBId(const Array<int>& offsets) {
-    // One CD frame is 1/75 of a second.
-    static const int FPS = 75;
-    int checksum = 0;
-    int tracks = offsets.size() - 1;
-
-    for (int i = 0; i < tracks; ++i)
-      checksum += sumOfDigits(offsets[i] / FPS);
-
-    int length = convertEarly
-      ? (offsets[tracks] / FPS - offsets[0] / FPS)
-      : ((offsets[tracks] - offsets[0]) / FPS);
-
-    // CCLLLLTT: checksum, length, tracks
-    return ((checksum & 0xFF) << 24) | (length << 8) | tracks;
-}
-
-// Compute the CDDB id from a volume with a .TOC.plist.
-// Returns NULL on success, otherwise a const char* representing an error.
-inline const char* getCDDBId(const File& volume, int* id) {
-    Array<int> offsets;
-    if (const char* error = getTrackOffsets(volume, &offsets))
-      return error;
-
-    *id = getCDDBId(offsets);
-    return NULL;
 }

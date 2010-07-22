@@ -26,13 +26,6 @@ const char* getTrackOffsets(XmlDocument* xmlDocument, Array<int>* offsets);
 // Returns NULL on success, otherwise a const char* representing an error.
 const char* getTrackOffsets(const File& volume, Array<int>* offsets);
 
-// Compute the CDDB id from an array of offsets.
-int getCDDBId(const Array<int>& offsets);
-
-// Compute the CDDB id from a volume with a .TOC.plist.
-// Returns NULL on success, otherwise a const char* representing an error.
-const char* getCDDBId(const File& volume, int* id);
-
 #include "juce_mac_AudioCDReader_helpers_impl.h"
 
 #endif  // __JUCE_MAC_AUDIOCDREADER_HELPERS_JUCEHEADER__

@@ -28,7 +28,6 @@
 
 #if JUCE_INCLUDED_FILE && JUCE_USE_CDREADER
 
-
 #include "juce_mac_AudioCDReader_helpers.h"
 
 //==============================================================================
@@ -85,51 +84,14 @@ AudioCDReader::~AudioCDReader()
 {
 }
 
-static int juce_getCDTrackNumber (const File& file)
-{
-    return file.getFileName()
-               .initialSectionContainingOnly ("0123456789")
-               .getIntValue();
-}
-
-int AudioCDReader::compareElements (const File& first, const File& second)
-{
-    const int firstTrack  = juce_getCDTrackNumber (first);
-    const int secondTrack = juce_getCDTrackNumber (second);
-
-    jassert (firstTrack > 0 && secondTrack > 0);
-
-    return firstTrack - secondTrack;
-}
-
 void AudioCDReader::refreshTrackLengths()
 {
-    tracks.clear();
-    trackStartSamples.clear();
-    volumeDir.findChildFiles (tracks, File::findFiles | File::ignoreHiddenFiles, false, "*.aiff");
-
-    tracks.sort (*this);
-
-    AiffAudioFormat format;
-    int sample = 0;
-
-    for (int i = 0; i < tracks.size(); ++i)
-    {
-        trackStartSamples.add (sample);
-
-        FileInputStream* const in = tracks.getReference(i).createInputStream();
-
-        if (in != 0)
-        {
-            ScopedPointer <AudioFormatReader> r (format.createReaderFor (in, true));
-
-            if (r != 0)
-                sample += (int) r->lengthInSamples;
-        }
+    if (const char* error = getTrackOffsets(volumeDir, &trackStartSamples)) {
+        // Log error here?
+        return;
     }
 
-    trackStartSamples.add (sample);
-    lengthInSamples = sample;
+    lengthInSamples = trackStartSamples[trackStartSamples.size() - 1] - trackStartSamples[0];
 }
 
 bool AudioCDReader::readSamples (int** destSamples, int numDestChannels, int startOffsetInDestBuffer,
@@ -191,19 +153,10 @@ bool AudioCDReader::isCDStillPresent() const
     return volumeDir.exists();
 }
 
-int AudioCDReader::getNumTracks() const
-{
-    return tracks.size();
-}
-
-int AudioCDReader::getPositionOfTrackStart (int trackNum) const
-{
-    return trackStartSamples [trackNum];
-}
-
 bool AudioCDReader::isTrackAudio (int trackNum) const
 {
-    return tracks [trackNum] != File::nonexistent;
+    File track = tracks [trackNum];
+    return track != File::nonexistent && track.getFileName().endsWith(".aiff");
 }
 
 void AudioCDReader::enableIndexScanning (bool b)
@@ -219,14 +172,6 @@ int AudioCDReader::getLastIndex() const
 const Array <int> AudioCDReader::findIndexesInTrack (const int trackNumber)
 {
     return Array <int>();
-}
-
-
-int AudioCDReader::getCDDBId()
-{
-    int id = 0;
-    getCDDBId(volumeDir, &id);  // How to log errors?
-    return id;
 }
 
 #endif
