@@ -400,8 +400,8 @@ index 9f8bc18..bbe7f02 100644
  {
      using namespace CDReaderHelpers;
 -    zeromem (trackStarts, sizeof (trackStarts));
-     zeromem (audioTracks, sizeof (audioTracks));
 +    trackStartSamples.clear();
+     zeromem (audioTracks, sizeof (audioTracks));
 
      TOC toc;
      zerostruct (toc);
