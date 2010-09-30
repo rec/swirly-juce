@@ -14,7 +14,7 @@ template <typename Number>
 Number average(Number x, Number y) { return (x + y) / 2; }
 
 template <>
-int average(int x, int y) { return int(x + (long)y / 2); }
+int average(int x, int y) { return int((x + (long)y)/ 2); }
 
 template <typename In, typename Out>
 struct Copy {
