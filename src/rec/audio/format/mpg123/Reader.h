@@ -18,9 +18,9 @@ namespace mpg123 {
 
 class Reader : public AudioFormatReader {
  public:
-	~Reader();
+  ~Reader();
 
-	virtual bool readSamples(int** destSamples, int numDestChannels,
+  virtual bool readSamples(int** destSamples, int numDestChannels,
                            int startOffsetInDestBuffer,
                            int64 startSampleInFile, int numSamples);
 
@@ -31,7 +31,7 @@ class Reader : public AudioFormatReader {
 
   friend Error createReader(InputStream*, AudioFormatReader**, OutputFormat*, OutputFormat*);
 
-	mpg123_handle* mh_;
+  mpg123_handle* mh_;
   void* buffer_;
   size_t size_, allocated_;
   Copier copier_;

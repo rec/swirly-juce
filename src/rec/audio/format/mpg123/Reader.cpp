@@ -22,7 +22,7 @@ Reader::Reader(InputStream* in, const String& formatName, mpg123_handle* mh,
     copier_(copier) {
 }
 
-Reader::~Reader()	{
+Reader::~Reader() {
   mpg123_close(mh_);
   mpg123_delete(mh_);
   free(buffer_);
