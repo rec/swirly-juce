@@ -1,0 +1,6 @@
+projects/*/Builds
+projects/*/JuceLibraryCode
+.DS_Store
+*.pyc
+*.pyo
+*~

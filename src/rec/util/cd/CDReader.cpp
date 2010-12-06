@@ -2,25 +2,46 @@
 
 #include "rec/util/cd/CDReader.h"
 
-
 using namespace juce;
 
 namespace rec {
 namespace util {
 namespace cd {
 
-AudioCDReader* getCDReader(const string& idString) {
-  int id = String(idString.c_str()).getHexValue32();
+AudioCDReader* getAudioCDReader(const String& idString) {
+  int id = idString.getHexValue32();
   StringArray names = AudioCDReader::getAvailableCDNames();
   int size = names.size();
   for (int i = 0; i < size; ++i) {
-    scoped_ptr<AudioCDReader> reader(AudioCDReader::createReaderForCD(i));
+    ScopedPointer<AudioCDReader> reader(AudioCDReader::createReaderForCD(i));
     if (!reader)
       LOG(ERROR) << "Couldn't create reader for " << names[i].toCString();
     else if (reader->getCDDBId() == id)
-      return reader.transfer();
+      return reader.release();
   }
   LOG(ERROR) << "Couldn't find an AudioCDReader for ID " << id;
+  return NULL;
+}
+
+AudioFormatReader* createCDTrackReader(AudioCDReader* r, int track) {
+  ScopedPointer<AudioCDReader> reader(r);
+  int trackIndex = getAudioTrackIndex(*reader, track);
+  if (trackIndex == -1) {
+    LOG(ERROR) << "No track " << track << " in " << r->getCDDBId();
+    return NULL;
+  }
+
+  int begin = reader->getPositionOfTrackStart(trackIndex);
+  int end = reader->getPositionOfTrackStart(trackIndex + 1);
+  return new AudioSubsectionReader(reader.release(), begin, end - begin, true);
+}
+
+AudioFormatReader* createCDTrackReader(const String& idString, int track) {
+  ScopedPointer<AudioCDReader> reader(getAudioCDReader(idString));
+  if (reader)
+    return createCDTrackReader(reader.release(), track);
+
+  LOG(ERROR) << "Couldn't create reader for " << idString;
   return NULL;
 }
 
@@ -39,24 +60,6 @@ int getAudioTrackCount(const AudioCDReader& reader) {
         ++audioTracks;
   }
   return audioTracks;
-}
-
-AudioFormatReader* createCDTrackReader(const string& idString, int track) {
-  scoped_ptr<AudioCDReader> reader(getCDReader(idString));
-  if (!reader) {
-    LOG(ERROR) << "Couldn't create reader for " << idString;
-    return NULL;
-  }
-
-  int trackIndex = getAudioTrackIndex(*reader, track);
-  if (trackIndex == -1) {
-    LOG(ERROR) << "No track " << track << " in " << idString;
-    return NULL;
-  }
-
-  int begin = reader->getPositionOfTrackStart(trackIndex);
-  int end = reader->getPositionOfTrackStart(trackIndex + 1);
-  return new AudioSubsectionReader(reader.transfer(), begin, end - begin, true);
 }
 
 }  // namespace cd
