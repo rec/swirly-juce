@@ -1,0 +1,100 @@
+APPENDIX 1: Crash traceback in my application.
+
+#0 0x944fdd3a in Debugger ()
+#1 0x003299b8 in juce::Desktop::~Desktop (this=0x2608150) at juce_Desktop.cpp:55
+#2 0x0036d934 in juce::DeletedAtShutdown::deleteAll () at juce_DeletedAtShutdown.cpp:75
+#3 0x0036dadc in juce::shutdownJuce_GUI () at juce_Initialisation.cpp:59
+#4 0x0036dd06 in juce::JUCEApplication::appWillTerminateByForce () at juce_Application.cpp:221
+#5 0x0054c813 in juce::AppDelegateRedirector::willTerminate (this=0x5101bc0) at juce_mac_MessageManager.mm:68
+#6 0x00214f93 in -[JuceAppDelegate_1_53_92_3 applicationWillTerminate:] (self=0x5101af0, _cmd=0x91706604, aNotification=0x24179a0) at juce_mac_MessageManager.mm:229
+#7 0x96e823bf in _nsnote_callback ()
+#8 0x98ce6793 in __CFXNotificationPost ()
+#9 0x98ce619a in _CFXNotificationPostNotification ()
+#10 0x96e7725c in -[NSNotificationCenter postNotificationName:object:userInfo:] ()
+#11 0x96e84669 in -[NSNotificationCenter postNotificationName:object:] ()
+#12 0x908ce333 in -[NSApplication terminate:] ()
+#13 0x906d3c46 in -[NSApplication sendAction:to:from:] ()
+#14 0x906d3af9 in -[NSMenuItem _corePerformAction] ()
+#15 0x906d37eb in -[NSCarbonMenuImpl performActionWithHighlightingForItemAtIndex:] ()
+#16 0x907cf403 in -[NSMenu _performActionWithHighlightingForItemAtIndex:] ()
+#17 0x907cebaf in -[NSMenu performKeyEquivalent:] ()
+#18 0x907cd353 in -[NSApplication _handleKeyEquivalent:] ()
+#19 0x906c31f2 in -[NSApplication sendEvent:] ()
+#20 0x0040eb92 in juce::MessageManager::runDispatchLoopUntil (this=0x5101a80, millisecondsToRunFor=20) at juce_mac_MessageManager.mm:437
+#21 0x0040effc in juce::ModalComponentManager::runEventLoopForCurrentComponent (this=0x2304820) at juce_ModalComponentManager.cpp:280
+#22 0x0040f196 in juce::Component::runModalLoop (this=0xbfffe850) at juce_Component.cpp:1555
+#23 0x0040f326 in juce::DialogWindow::showModalDialog (dialogTitle=@0xbfffea04, contentComponent=0xbfffea10, componentToCentreAround=0x0, backgroundColour=@0xb1fae4, escapeKeyTriggersCloseButton=true, shouldBeResizable=true, useBottomRightCornerResizer=true) at juce_DialogWindow.cpp:123
+#24 0x0014a90b in rec::slow::midiMappings (i=0x2307800) at /development/rec/projects/slow/Builds/MacOSX/../../../../src/rec/slow/TargetCommands.cpp:114
+#25 0x00147ef1 in rec::util::thread::callback::CallbackFunc1<void (*)(rec::slow::Instance*), rec::slow::Instance*>::operator() (this=0x163f380) at Callback1.h:45
+#26 0x0009150c in rec::command::TargetManager::perform (this=0x163e670, invocation=@0xbfffedbc) at /development/rec/projects/slow/Builds/MacOSX/../../../../src/rec/command/TargetManager.cpp:58
+#27 0x00322c75 in juce::ApplicationCommandTarget::tryToInvoke (this=0x163e670, info=@0xbfffedbc, async=false) at juce_ApplicationCommandTarget.cpp:59
+#28 0x00322dd5 in juce::ApplicationCommandTarget::invoke (this=0x163e670, info=@0xbfffedbc, async=false) at juce_ApplicationCommandTarget.cpp:140
+#29 0x00369347 in juce::ApplicationCommandManager::invoke (this=0x163e694, info_=@0xbfffee48, asynchronously=false) at juce_ApplicationCommandManager.cpp:204
+#30 0x0036968b in juce::KeyPressMappingSet::invokeCommand (this=0x163e760, commandID=17, key=@0xbfffef28, isKeyDown=true, millisecsSinceKeyPressed=0, originatingComponent=0x2401660) at juce_KeyPressMappingSet.cpp:228
+#31 0x003d4330 in juce::KeyPressMappingSet::keyPressed (this=0x163e760, key=@0xbfffef28, originatingComponent=0x2401660) at juce_KeyPressMappingSet.cpp:349
+#32 0x003338ed in juce::ComponentPeer::handleKeyPress (this=0x240ff10, keyCode=77, textCharacter=0) at juce_ComponentPeer.cpp:184
+#33 0x003840a5 in juce::NSViewComponentPeer::handleKeyEvent (this=0x240ff10, ev=0x233ecd0, isKeyDown=true) at juce_mac_NSViewComponentPeer.mm:1295
+#34 0x003841fa in juce::NSViewComponentPeer::redirectKeyDown (this=0x240ff10, ev=0x233ecd0) at juce_mac_NSViewComponentPeer.mm:1313
+#35 0x002cefa7 in -[JuceNSView_1_53_92_3 keyDown:] (self=0x240ff70, _cmd=0x90e2bf8c, ev=0x233ecd0) at juce_mac_NSViewComponentPeer.mm:431
+#36 0x907aad38 in -[NSWindow sendEvent:] ()
+#37 0x906c3817 in -[NSApplication sendEvent:] ()
+#38 0x906572a7 in -[NSApplication run] ()
+#39 0x0036cdd1 in juce::MessageManager::runDispatchLoop (this=0x5101a80) at juce_mac_MessageManager.mm:306
+#40 0x003ee8de in juce::JUCEApplication::main (commandLine=@0xbffff5f8) at juce_Application.cpp:241
+#41 0x003eeaf8 in juce::JUCEApplication::main (argc=1, argv=0xbffff654) at juce_Application.cpp:275
+#42 0x001d9bb7 in main (argc=1, argv=0xbffff654) at /development/rec/projects/slow/Builds/MacOSX/../../Main.cpp:4
+#43 0x0005973e in start () at limits:1073
+
+
+APPENDIX 2: memory leak traceback in the JUCE demo!
+
+#0 0x944fdd3a in Debugger ()
+#1 0x0037862c in juce::LeakedObjectDetector<juce::FileChooser>::LeakCounter::~LeakCounter (this=0x79b944) at juce_LeakedObjectDetector.h:95
+#2 0x0028d90a in __tcf_59 () at juce_LeakedObjectDetector.h:109
+#3 0x9790719f in __cxa_finalize ()
+#4 0x979070b4 in exit ()
+#5 0x908ce48a in -[NSApplication terminate:] ()
+#6 0x906d3c46 in -[NSApplication sendAction:to:from:] ()
+#7 0x906d3af9 in -[NSMenuItem _corePerformAction] ()
+#8 0x906d37eb in -[NSCarbonMenuImpl performActionWithHighlightingForItemAtIndex:] ()
+#9 0x907cf403 in -[NSMenu _performActionWithHighlightingForItemAtIndex:] ()
+#10 0x907cebaf in -[NSMenu performKeyEquivalent:] ()
+#11 0x907cd353 in -[NSApplication _handleKeyEquivalent:] ()
+#12 0x906c31f2 in -[NSApplication sendEvent:] ()
+#13 0x9090c863 in -[NSApplication _realDoModalLoop:peek:] ()
+#14 0x9090bf89 in -[NSApplication runModalForWindow:] ()
+#15 0x90ba0081 in -[NSSavePanel runModal] ()
+#16 0x90b996f9 in -[NSSavePanel runModalForDirectory:file:] ()
+#17 0x003ec29b in juce::FileChooser::showPlatformDialog (results=@0xbfffdc00, title=@0xbfffdbf0, currentFileOrDirectory=@0xbfffdbf8, filter=@0xbfffdbf4, selectsDirectory=false, selectsFiles=true, isSaveDialogue=false, selectMultipleFiles=false) at juce_mac_FileChooser.mm:134
+#18 0x0033d5f7 in juce::FileChooser::showDialog (this=0xbfffdbf0, selectsDirectories=false, selectsFiles=true, isSave=false, warnAboutOverwritingExistingFiles=false, selectMultipleFiles=false, previewComponent=0x0) at juce_FileChooser.cpp:112
+#19 0x0033e360 in juce::FileChooser::browseForFileToOpen (this=0xbfffdbf0, previewComponent=0x0) at juce_FileChooser.cpp:62
+#20 0x0033e514 in juce::FilenameComponent::buttonClicked (this=0x16826934) at juce_FilenameComponent.cpp:119
+#21 0x00353c1e in juce::ListenerList<juce::Button::Listener, juce::Array<juce::Button::Listener*, juce::DummyCriticalSection> >::callChecked<juce::Component::BailOutChecker, juce::Button*> (this=0x5307f44, bailOutChecker=@0xbfffdcdc, callbackFunction={__pfn = 0x9, __delta = 0}, param1=0x5307ea0) at juce_ListenerList.h:181
+#22 0x002a8814 in juce::Button::sendClickMessage (this=0x5307ea0, modifiers=@0xbfffdde0) at juce_Button.cpp:384
+#23 0x002b2743 in juce::Button::internalClickCallback (this=0x5307ea0, modifiers=@0xbfffdde0) at juce_Button.cpp:325
+#24 0x002cd1bd in juce::Button::mouseUp (this=0x5307ea0, e=@0xbfffddd8) at juce_Button.cpp:440
+#25 0x002ea1f5 in juce::Component::internalMouseUp (this=0x5307ea0, source=@0x1e02c00, relativePos=@0xbfffde74, time=@0xbfffdf64, oldModifiers=@0xbfffde7c) at juce_Component.cpp:2485
+#26 0x003b110c in juce::MouseInputSourceInternal::sendMouseUp (this=0x1e02c10, comp=0x5307ea0, screenPos=@0xbfffdecc, time=@0xbfffdf64) at juce_MouseInputSource.cpp:134
+#27 0x003b1cd0 in juce::MouseInputSourceInternal::setButtons (this=0x1e02c10, screenPos=@0xbfffdf14, time=@0xbfffdf64, newButtonState=@0xbfffdf6c) at juce_MouseInputSource.cpp:166
+#28 0x003b22e0 in juce::MouseInputSourceInternal::handleEvent (this=0x1e02c10, newPeer=0x5301e40, positionWithinPeer=@0xbfffe008, time=@0xbfffdf64, newMods=@0xbfffdf6c) at juce_MouseInputSource.cpp:279
+#29 0x002ebecc in juce::MouseInputSource::handleEvent (this=0x1e02c00, peer=0x5301e40, positionWithinPeer=@0xbfffe008, time=1308155105410, mods=@0x7a4a24) at juce_MouseInputSource.cpp:528
+#30 0x002ebfda in juce::ComponentPeer::handleMouseEvent (this=0x5301e40, touchIndex=0, positionWithinPeer=@0xbfffe008, newMods=@0x7a4a24, time=1308155105410) at juce_ComponentPeer.cpp:107
+#31 0x003df100 in juce::NSViewComponentPeer::sendMouseEvent (this=0x5301e40, ev=0x5300ab0) at juce_mac_NSViewComponentPeer.mm:1362
+#32 0x003e1f51 in juce::NSViewComponentPeer::redirectMouseUp (this=0x5301e40, ev=0x5300ab0) at juce_mac_NSViewComponentPeer.mm:1374
+#33 0x003d0b64 in -[JuceNSView_1_53_92_JSLvvV6j asyncMouseUp:] (self=0x5301ed0, _cmd=0x46c3c3, ev=0x5300ab0) at juce_mac_NSViewComponentPeer.mm:381
+#34 0x96e98cdd in __NSThreadPerformPerform ()
+#35 0x98cca4cb in __CFRunLoopDoSources0 ()
+#36 0x98cc7f8f in __CFRunLoopRun ()
+#37 0x98cc7464 in CFRunLoopRunSpecific ()
+#38 0x98cc7291 in CFRunLoopRunInMode ()
+#39 0x93d5ee04 in RunCurrentEventLoopInMode ()
+#40 0x93d5eaf5 in ReceiveNextEventCommon ()
+#41 0x93d5ea3e in BlockUntilNextEventMatchingListInMode ()
+#42 0x9069578d in _DPSNextEvent ()
+#43 0x90694fce in -[NSApplication nextEventMatchingMask:untilDate:inMode:dequeue:] ()
+#44 0x90657247 in -[NSApplication run] ()
+#45 0x003e0fc3 in juce::MessageManager::runDispatchLoop (this=0x1b06ee0) at juce_mac_MessageManager.mm:306
+#46 0x001823c6 in juce::JUCEApplication::main (commandLine=@0xbffff5a8) at juce_Application.cpp:241
+#47 0x001825e2 in juce::JUCEApplication::main (argc=1, argv=0xbffff604) at juce_Application.cpp:275
+#48 0x0000d2dd in main (argc=1, argv=0xbffff604) at /development/juce.tip/extras/JuceDemo/Builds/MacOSX/../../Source/ApplicationStartup.cpp:156
+
