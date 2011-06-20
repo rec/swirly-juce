@@ -17,15 +17,17 @@ import sys
 if __name__ == '__main__':
   # print os.path.abspath(sys.argv[0])
   args = sys.argv[1:]
-  command = args.pop(0)
+  cmd = args.pop(0)
 
   try:
-    exec 'from commands import %s' % command
+    exec 'from commands import %s' % cmd
 
-    module = locals()[command]
-    function = getattr(module, command)
+    module = locals()[cmd]
+    function = getattr(module, cmd)
     print function(*args)
 
   except ImportError:
-    print "Couldn't find command/%s.py" % command
-    raise
+    print "ERROR: Couldn't find file commands/%s.py" % cmd
+
+  except AttributeError:
+    print "ERROR: File commands/%s.py needs a function named %s()" % (cmd, cmd)
