@@ -10,7 +10,16 @@
 
 # A Juce command that just prints the version number!
 
+def updateOne(package):
+  print 'Updated package %s' % package
+  pass
+
+
 def update(*packages):
   if not packages:
     raise Exception('No packages to update')
-  return 'Updated packages %s.' % ', '.join(packages)
+
+  for p in packages:
+    updateOne(p)
+
+  return 'Updated all packages: %s.' % ', '.join(packages)

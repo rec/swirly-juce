@@ -1,6 +1,5 @@
 #!/usr/local/bin/python
 
-import os.path
 import sys
 
 # Main program for the juce build system routes control to other scripts in the
@@ -15,7 +14,6 @@ import sys
 
 
 if __name__ == '__main__':
-  # print os.path.abspath(sys.argv[0])
   args = sys.argv[1:]
   cmd = args.pop(0)
 
@@ -26,11 +24,12 @@ if __name__ == '__main__':
     function = getattr(module, cmd)
     print function(*args)
 
-  except ImportError:
-    print "ERROR: Couldn't find file commands/%s.py" % cmd
+  except ImportError as e:
+    print "ERROR: in import commands/%s.py: %s" % (cmd, e)
 
   except AttributeError:
     print "ERROR: File commands/%s.py needs a function named %s()" % (cmd, cmd)
 
   except Exception as e:
-    print 'ERROR: %s' % e
+    print 'ERROR: Exception: %s' % e
+    raise
