@@ -25,5 +25,5 @@ def _getRoot():
 
 _ROOT = _getRoot()
 
-def root():
-  return _ROOT
+def root(path=''):
+  return os.path.join(_ROOT, path)

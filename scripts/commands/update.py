@@ -7,12 +7,33 @@
 #
 # Essentially, you can do as you please with it.  Have fun!
 
+import stat
+import os
+import os.path
 
-# A Juce command that just prints the version number!
+import util.root
 
-def updateOne(package):
-  print 'Updated package %s' % package
-  pass
+# A Juce command that updates the package
+
+class Updater(object):
+  def __init__(self, package):
+    self.package = package
+    self.path = util.root.root(package)
+
+  def __call__(self):
+    if os.path.isdir(self.path):
+      self.__update()
+    else:
+      self.__download()
+
+    print 'Updated package %s' % self.package
+
+  def __update(self):
+    pass
+
+  def __download(self):
+    if os.path.isfile(self.path):
+      raise Exception("There's a file on %s" % self.path)
 
 
 def update(*packages):
@@ -20,6 +41,6 @@ def update(*packages):
     raise Exception('No packages to update')
 
   for p in packages:
-    updateOne(p)
+    Updater(p)()
 
   return 'Updated all packages: %s.' % ', '.join(packages)
