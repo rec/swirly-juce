@@ -1,5 +1,6 @@
 #!/usr/local/bin/python
 
+import os.path
 import sys
 
 # Main program for the juce build system routes control to other scripts.
@@ -13,6 +14,7 @@ import sys
 
 
 if __name__ == '__main__':
+  # print os.path.abspath(sys.argv[0])
   args = sys.argv[1:]
   command = args.pop(0)
 
