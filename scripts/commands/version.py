@@ -12,5 +12,5 @@ VERSION = '0.2.1'
 
 # A Juce command that just prints the version number!
 
-def version(*args):
+def version():
   return 'juce version %s' % VERSION
