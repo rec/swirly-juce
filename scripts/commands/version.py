@@ -8,7 +8,7 @@
 # Essentially, you can do as you please with it.  Have fun!
 
 
-VERSION = '0.1'
+VERSION = '0.2.1'
 
 # A Juce command that just prints the version number!
 

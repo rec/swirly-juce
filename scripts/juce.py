@@ -3,7 +3,8 @@
 import os.path
 import sys
 
-# Main program for the juce build system routes control to other scripts.
+# Main program for the juce build system routes control to other scripts in the
+# directory "commands".
 #
 # Copyright (c) 2011 Tom Swirly
 #
@@ -20,9 +21,11 @@ if __name__ == '__main__':
 
   try:
     exec 'from commands import %s' % command
+
+    module = locals()[command]
+    function = getattr(module, command)
+    print function(*args)
+
   except ImportError:
     print "Couldn't find command/%s.py" % command
     raise
-
-  f = getattr(locals()[command], command)
-  print f(*args)
