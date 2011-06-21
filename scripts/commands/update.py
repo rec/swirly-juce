@@ -11,6 +11,7 @@ import stat
 import os
 import os.path
 
+import util.config
 import util.root
 
 # A Juce command that updates the package
@@ -18,7 +19,10 @@ import util.root
 class Updater(object):
   def __init__(self, package):
     self.package = package
+    self.config = util.config.config(package)
     self.path = util.root.root(package)
+
+    print self.config
 
   def __call__(self):
     if os.path.isdir(self.path):
