@@ -1,0 +1,40 @@
+8
+
+dir
+93
+http://google-glog.googlecode.com/svn/trunk/packages/rpm
+http://google-glog.googlecode.com/svn
+
+
+
+2009-04-10T05:49:58.610451Z
+46
+shinichiro.hamaji
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+eb4d4688-79bd-11dd-afb4-1d65580434c0
+
+rpm.spec
+file
+
+
+
+
+2011-06-21T06:51:47.000000Z
+70a0eac4b89ffd3c8a8a301e115b8e7d
+2009-04-10T05:49:58.610451Z
+46
+shinichiro.hamaji
+

@@ -13,6 +13,7 @@ import os.path
 
 import util.config
 import util.root
+import util.source
 
 # A Juce command that updates the package
 
@@ -22,22 +23,15 @@ class Updater(object):
     self.config = util.config.config(package)
     self.path = util.root.root(package)
 
-    print self.config
-
   def __call__(self):
-    if os.path.isdir(self.path):
-      self.__update()
-    else:
-      self.__download()
-
-    print 'Updated package %s' % self.package
-
-  def __update(self):
-    pass
-
-  def __download(self):
-    if os.path.isfile(self.path):
+    isUpdate = os.path.isdir(self.path)
+    if not isUpdate and os.path.isfile(self.path):
       raise Exception("There's a file on %s" % self.path)
+    cmd = util.source.getSourceCommand('update' if isUpdate else 'download',
+                                       self.config)
+    # res = os.system(cmd)
+    print "COMMAND: ", cmd
+    print '%s %s' % (('Updated' if isUpdate else 'Downloaded'), self.package)
 
 
 def update(*packages):

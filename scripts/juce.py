@@ -29,6 +29,7 @@ if __name__ == '__main__':
 
   except AttributeError:
     print "ERROR: File commands/%s.py needs a function named %s()" % (cmd, cmd)
+    raise
 
   except Exception as e:
     print 'ERROR: Exception: %s' % e

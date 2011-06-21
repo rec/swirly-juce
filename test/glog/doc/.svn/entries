@@ -1,0 +1,54 @@
+8
+
+dir
+93
+http://google-glog.googlecode.com/svn/trunk/doc
+http://google-glog.googlecode.com/svn
+
+
+
+2010-05-28T03:21:44.863723Z
+79
+shinichiro.hamaji
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+eb4d4688-79bd-11dd-afb4-1d65580434c0
+
+designstyle.css
+file
+
+
+
+
+2011-06-21T06:51:47.000000Z
+f2f0e7cf3ebe55371ac6fd753a8b7d3f
+2008-10-08T11:20:32.021747Z
+3
+shinichiro.hamaji
+has-props
+
+glog.html
+file
+
+
+
+
+2011-06-21T06:51:47.000000Z
+9ba5ea8992fe098f0ead6fc73efefaa1
+2010-05-28T03:21:44.863723Z
+79
+shinichiro.hamaji
+has-props
+

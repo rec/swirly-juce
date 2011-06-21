@@ -1,4 +1,5 @@
 {
+  "name": "juce",
   "source_control": "git",
   "provider": "sourceforge"
 }
