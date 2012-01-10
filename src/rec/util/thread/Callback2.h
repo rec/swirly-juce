@@ -22,44 +22,27 @@ class Callback2 : public Callback {
   Method method_;
   V1 v1_;
   V2 v2_;
+
+  DISALLOW_COPY_ASSIGN_EMPTY_AND_LEAKS(Callback2);
 };
 
-template <typename Type, typename Method, typename V1, typename V2>
-class CallbackBool2 : public Callback {
+template <typename Functor, typename V1, typename V2>
+class CallbackFunc2 : public Callback {
  public:
-  CallbackBool2(Type* o, Method m, V1 v1, V2 v2) : object_(o), method_(m), v1_(v1), v2_(v2) {}
+  CallbackFunc2(Functor f, V1 v1, V2 v2) : functor_(f), v1_(v1), v2_(v2) {
+  }
 
-  virtual bool operator()() { return (object_->*method_)(v1_, v2_); }
+  virtual bool operator()() { (*functor_)(v1_, v2_); return true; }
 
  private:
-  Type* object_;
-  Method method_;
+  Functor functor_;
   V1 v1_;
   V2 v2_;
+
+  DISALLOW_COPY_ASSIGN_EMPTY_AND_LEAKS(CallbackFunc2);
 };
 
 }  // namespace callback
-
-template <typename Type, typename Method, typename V1, typename V2>
-Callback* makeCallback(Type* o, Method m, V1 v1, V2 v2) {
-  return new thread::callback::Callback2<Type, Method, V1, V2>(o, m, v1, v2);
-}
-
-template <typename Type, typename Method, typename V1, typename V2>
-Callback* makeCallbackBool(Type* o, Method m, V1 v1, V2 v2) {
-  return new thread::callback::CallbackBool2<Type, Method, V1, V2>(o, m, v1, v2);
-}
-
-template <typename Type, typename Method, typename V1, typename V2>
-void callAsync(Type* o, Method m, V1 v1, V2 v2) {
-  (new thread::callback::CallbackMessage(makeCallback<Type, Method, V1, V2>(o, m, v1, v2)))->post();
-}
-
-template <typename Type, typename Method, typename V1, typename V2>
-Thread* makeThread(const String& name, Type* o, Method m, V1 v1, V2 v2) {
-  return new thread::callback::Thread(name, makeCallback<Type, Method, V1, V2>(o, m, v1, v2));
-}
-
 }  // namespace thread
 }  // namespace util
 }  // namespace rec
